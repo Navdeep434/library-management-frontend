@@ -207,12 +207,17 @@ export default function EditBookPage() {
                 className="h-24 mb-2 rounded"
               />
             )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setThumbnail(e.target.files[0])}
-              className="w-full"
-            />
+            <div className="relative w-fit">
+              <label className="cursor-pointer inline-block bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-1 px-3 rounded shadow">
+                Choose Thumbnail
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setThumbnail(e.target.files[0])}
+                  className="absolute left-0 top-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </label>
+            </div>
           </div>
         )}
 
