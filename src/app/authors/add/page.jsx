@@ -50,6 +50,7 @@ export default function AddAuthorPage() {
       });
 
       if (res.ok) {
+        window.alert("Author added successfully!");
         router.push("/authors");
       } else {
         alert("Failed to add author.");

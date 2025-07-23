@@ -80,12 +80,14 @@ export default function EditPublisherPage(props) {
       });
 
       if (res.ok) {
+        window.alert("Publisher updated successfully!");
         router.push("/publishers");
       } else {
         alert("Failed to update publisher");
       }
     } catch (err) {
       console.error("Error updating publisher:", err);
+      alert("An error occurred. Please try again.");
     }
   };
 

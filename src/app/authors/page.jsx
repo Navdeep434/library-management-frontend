@@ -14,116 +14,86 @@ export default function AuthorListPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Get authentication data
     const userData = localStorage.getItem("user");
-    let storedToken = null;
-    let storedRole = null;
-
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
-        storedToken = user.token;
-        storedRole = user.role;
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-        router.push("/login");
-        return;
-      }
-    }
-
-    // Fallback: check if token is stored separately
-    if (!storedToken) {
-      storedToken = localStorage.getItem("token");
-    }
-    if (!storedRole) {
-      storedRole = localStorage.getItem("userRole");
-    }
-
-    if (!storedToken) {
+    if (!userData) {
       router.push("/login");
       return;
     }
 
-    setToken(storedToken);
-    setRole(storedRole);
-    fetchAuthors("", storedToken);
+    try {
+      const user = JSON.parse(userData);
+      setToken(user.token);
+      setRole(user.role);
+      fetchAuthors(user.token);
+    } catch (err) {
+      console.error("Invalid user data", err);
+      router.push("/login");
+    }
   }, []);
 
-  const fetchAuthors = async (name = "", authToken = token) => {
+  const fetchAuthors = async (authToken, search = "") => {
     setLoading(true);
     try {
-      const url = name
-        ? `http://localhost:8080/api/authors/search?name=${encodeURIComponent(name)}`
-        : `http://localhost:8080/api/authors`;
-      
-      const res = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
-        },
-      });
+      const res = await fetch(
+        search
+          ? `http://localhost:8080/api/authors/search?name=${encodeURIComponent(search)}`
+          : `http://localhost:8080/api/authors`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         if (res.status === 401) {
-          // Token expired or invalid
-          localStorage.removeItem("user");
-          localStorage.removeItem("token");
+          localStorage.clear();
           router.push("/login");
           return;
         }
-        throw new Error(`Request failed with status ${res.status}`);
+        throw new Error("Failed to fetch authors");
       }
 
       const data = await res.json();
       setAuthors(data);
     } catch (err) {
-      console.error("Failed to fetch authors", err);
-      alert("Failed to load authors. Please try again.");
+      console.error(err);
+      alert("Failed to fetch authors. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const trimmed = searchTerm.trim();
-    if (!trimmed) {
-      fetchAuthors("");
-      return;
-    }
-    fetchAuthors(trimmed);
+    fetchAuthors(token, searchTerm);
   };
 
-  const handleDelete = async (authorId) => {
-    if (!confirm("Are you sure you want to delete this author?")) {
-      return;
-    }
+  const handleClear = () => {
+    setSearchTerm("");
+    fetchAuthors(token);
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this author?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/authors/${authorId}`, {
-        method: 'DELETE',
+      const res = await fetch(`http://localhost:8080/api/authors/${id}`, {
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!res.ok) {
-        if (res.status === 401) {
-          localStorage.removeItem("user");
-          localStorage.removeItem("token");
-          router.push("/login");
-          return;
-        }
-        throw new Error(`Delete failed with status ${res.status}`);
-      }
+      if (!res.ok) throw new Error("Delete failed");
 
-      // Remove author from local state
-      setAuthors(authors.filter(author => author.id !== authorId));
-      alert("Author deleted successfully!");
+      setAuthors(authors.filter((a) => a.id !== id));
+      alert("Author deleted successfully");
     } catch (err) {
-      console.error("Failed to delete author", err);
-      alert("Failed to delete author. Please try again.");
+      console.error(err);
+      alert("Failed to delete author");
     }
   };
 
@@ -141,8 +111,7 @@ export default function AuthorListPage() {
         )}
       </div>
 
-      {/* 🔍 Search */}
-      <form onSubmit={handleSearch} className="mb-4 flex gap-3">
+      <form onSubmit={handleSearchSubmit} className="mb-4 flex gap-3">
         <input
           type="text"
           placeholder="Search by name"
@@ -158,10 +127,7 @@ export default function AuthorListPage() {
         </button>
         <button
           type="button"
-          onClick={() => {
-            setSearchTerm("");
-            fetchAuthors("");
-          }}
+          onClick={handleClear}
           className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
         >
           Clear

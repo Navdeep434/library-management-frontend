@@ -48,12 +48,14 @@ export default function AddPublisherPage() {
       });
 
       if (res.ok) {
+        window.alert("Publisher added successfully!");
         router.push("/publishers");
       } else {
         alert("Failed to add publisher.");
       }
     } catch (err) {
       console.error("Error creating publisher:", err);
+      alert("An error occurred. Please try again.");
     }
   };
 
@@ -84,7 +86,7 @@ export default function AddPublisherPage() {
         </div>
         <button
           type="submit"
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 w-full"
         >
           Add Publisher
         </button>

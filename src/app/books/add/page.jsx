@@ -86,6 +86,7 @@ export default function AddBookPage() {
         return;
       }
 
+      window.alert("Book added successfully!");
       router.push("/books");
     } catch (err) {
       console.error("Error creating book:", err);

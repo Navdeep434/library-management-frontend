@@ -75,9 +75,9 @@ export default function EditBookPage() {
 
       const book = await bookRes.json();
       setTitle(book.title);
-      setAuthorId(book.author?.id || "");
-      setPublisherId(book.publisher?.id || "");
-      setCategory(book.category || "");
+      setAuthorId(book.author.id);
+      setPublisherId(book.publisher.id);
+      setCategory(book.category);
       setPreview(book.thumbnailUrl);
 
       setAuthors(await authorsRes.json());
@@ -128,6 +128,7 @@ export default function EditBookPage() {
         }
       }
 
+      window.alert("Book updated successfully!");
       router.push("/books");
     } catch (err) {
       console.error("Error updating book:", err);
@@ -161,7 +162,9 @@ export default function EditBookPage() {
           >
             <option value="">Select Author</option>
             {authors.map((a) => (
-              <option key={a.id} value={a.id}>{a.name}</option>
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
             ))}
           </select>
         </div>
@@ -176,7 +179,9 @@ export default function EditBookPage() {
           >
             <option value="">Select Publisher</option>
             {publishers.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
             ))}
           </select>
         </div>

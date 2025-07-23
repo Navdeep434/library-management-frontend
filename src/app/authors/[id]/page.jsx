@@ -76,12 +76,14 @@ export default function EditAuthorPage(props) {
       });
 
       if (res.ok) {
+        window.alert("Author updated successfully!");
         router.push("/authors");
       } else {
         alert("Failed to update author");
       }
     } catch (err) {
       console.error("Update error", err);
+      alert("An error occurred. Please try again.");
     }
   };
 

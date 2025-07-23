@@ -46,7 +46,7 @@ export default function UserListPage() {
     setLoading(true);
     try {
       const url = term
-        ? `http://localhost:8080/api/users/search?query=${encodeURIComponent(term)}`
+        ? `http://localhost:8080/api/users/search?term=${encodeURIComponent(term)}`
         : `http://localhost:8080/api/users`;
 
       const res = await fetch(url, {
@@ -105,7 +105,7 @@ export default function UserListPage() {
       }
 
       setUsers(users.filter((user) => user.id !== userId));
-      alert("User deleted successfully!");
+      window.alert("User deleted successfully!");
     } catch (err) {
       console.error("Delete error:", err);
       alert("Could not delete user.");

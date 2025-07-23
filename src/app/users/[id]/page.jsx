@@ -48,7 +48,7 @@ export default function EditUserPage() {
 
     if (storedRole !== "ADMIN") {
       alert("Access denied. Admins only.");
-      router.push("/"); // or a 403 page
+      router.push("/");
       return;
     }
 
@@ -99,6 +99,7 @@ export default function EditUserPage() {
       });
 
       if (res.ok) {
+        window.alert("User updated successfully!");
         router.push("/users");
       } else {
         alert("Failed to update user");
@@ -113,7 +114,10 @@ export default function EditUserPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Edit User</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md space-y-4 max-w-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded shadow-md space-y-4 max-w-lg"
+      >
         <div>
           <label className="block mb-1 font-medium">Name</label>
           <input
