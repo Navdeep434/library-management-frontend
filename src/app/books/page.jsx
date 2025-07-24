@@ -16,7 +16,6 @@ export default function BookListPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Get user data from localStorage
     const userData = localStorage.getItem("user");
     let storedToken = null;
     let storedRole = null;
@@ -33,13 +32,8 @@ export default function BookListPage() {
       }
     }
 
-    // Fallback: check if token and role are stored separately
-    if (!storedToken) {
-      storedToken = localStorage.getItem("token");
-    }
-    if (!storedRole) {
-      storedRole = localStorage.getItem("userRole");
-    }
+    if (!storedToken) storedToken = localStorage.getItem("token");
+    if (!storedRole) storedRole = localStorage.getItem("userRole");
 
     if (!storedToken) {
       router.push("/login");
@@ -67,7 +61,6 @@ export default function BookListPage() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          // Token expired or invalid
           localStorage.removeItem("user");
           localStorage.removeItem("token");
           router.push("/login");
@@ -80,7 +73,6 @@ export default function BookListPage() {
       setBooks(data);
     } catch (err) {
       console.error("Failed to fetch books", err);
-      // Show user-friendly error message
       alert("Failed to load books. Please try again.");
     } finally {
       setLoading(false);
@@ -91,7 +83,6 @@ export default function BookListPage() {
     e.preventDefault();
     const trimmed = searchTerm.trim();
     if (!trimmed) {
-      // If search is empty, fetch all books
       fetchBooks("");
       return;
     }
@@ -100,9 +91,7 @@ export default function BookListPage() {
   };
 
   const handleDelete = async (bookId) => {
-    if (!confirm("Are you sure you want to delete this book?")) {
-      return;
-    }
+    if (!confirm("Are you sure you want to delete this book?")) return;
 
     try {
       const res = await fetch(`http://localhost:8080/api/books/${bookId}`, {
@@ -117,7 +106,6 @@ export default function BookListPage() {
         throw new Error(`Delete failed with status ${res.status}`);
       }
 
-      // Remove the book from the local state
       setBooks(books.filter(book => book.id !== bookId));
       alert("Book deleted successfully!");
     } catch (err) {
@@ -130,7 +118,7 @@ export default function BookListPage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Books</h1>
-        {role === "ADMIN" && ( // Note: Changed from "admin" to "ADMIN" to match your role format
+        {role === "ADMIN" && (
           <Link
             href="/books/add"
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
@@ -194,6 +182,7 @@ export default function BookListPage() {
             <thead className="bg-gray-100 text-gray-700">
               <tr>
                 <th className="px-4 py-2 text-left">ID</th>
+                <th className="px-4 py-2 text-left">Thumbnail</th>
                 <th className="px-4 py-2 text-left">Title</th>
                 <th className="px-4 py-2 text-left">Author</th>
                 <th className="px-4 py-2 text-left">Publisher</th>
@@ -205,6 +194,17 @@ export default function BookListPage() {
               {books.map((book) => (
                 <tr key={book.id} className="border-t hover:bg-gray-50">
                   <td className="px-4 py-2">{book.id}</td>
+                  <td className="px-4 py-2">
+                    {book.thumbnailUrl ? (
+                      <img
+                        src={`http://localhost:8080/${book.thumbnailUrl}`}
+                        alt={book.title}
+                        className="h-12 w-12 object-cover rounded"
+                      />
+                    ) : (
+                      <span className="text-gray-400 italic">No image</span>
+                    )}
+                  </td>
                   <td className="px-4 py-2 font-medium">{book.title}</td>
                   <td className="px-4 py-2">{book.author?.name || "-"}</td>
                   <td className="px-4 py-2">{book.publisher?.name || "-"}</td>
